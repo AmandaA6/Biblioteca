@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autores</title>
+</head>
+<body>
+
+    <h2>Lista de Autores</h2>
+    <a href="{{ url_for('cadastrar_autor') }}">+ Novo Autor</a>
+    <hr>
+
+    <ul>
+    {% for autor in autores %}
+    <li>
+        <strong>{{ autor.Nome_autor }}</strong> — {{ autor.Nacionalidade }}
+        <a href="{{ url_for('editar_autor', id=autor.ID_autor) }}">Editar</a>
+        <a href="{{ url_for('excluir_autor', id=autor.ID_autor) }}">Excluir</a>
+    </li>
+    {% endfor %}
+    </ul>
+
+</body>
+</html>
