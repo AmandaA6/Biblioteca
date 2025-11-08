@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Gênero</title>
+</head>
+<body>
+<div class="container mt-5">
+    <h2>Editar Gênero</h2>
+    <form action="{{ url_for('editar_genero', id=dado.id_genero) }}" method="POST">
+        <div class="mb-3">
+            <label for="nome" class="form-label">Nome do Gênero</label>
+            <input type="text" class="form-control" id="nome" name="nome" value="{{ dado.Nome_genero }}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+        <a href="{{ url_for('listar_generos') }}" class="">Cancelar</a>
+    </form>
+</div>
+</body>
+</html>
