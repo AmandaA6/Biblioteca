@@ -34,7 +34,7 @@ def cadastro():
         flash('Cadastro realizado com sucesso! Faça login.', 'success')
         return redirect(url_for('login'))
 
-    return render_template('cadastro.html')
+    return render_template('usuarios/cadastro.html')
 
 # Login Usuários
 @app.route('/login', methods=['GET', 'POST'])
@@ -54,7 +54,7 @@ def login():
         else:
             flash('Email ou senha incorretos.', 'danger')
 
-    return render_template('login.html')
+    return render_template('usuarios/login.html')
 
 # LOGOUT 
 @app.route('/logout')
@@ -95,7 +95,7 @@ def editar_genero(id):
             return redirect(url_for('listar_generos'))
 
         genero = conn.execute(text("SELECT * FROM generos WHERE id_genero=:id"), {"id": id}).fetchone()
-    return render_template('generos/cadastrar_genero.html', tabela='generos', dado=genero)
+    return render_template('generos/editar_genero.html', tabela='generos', dado=genero)
 
 # Excluir Gêneros 
 @app.route('/generos/excluir/<int:id>')
@@ -320,7 +320,7 @@ def editar_usuario(id):
             return redirect(url_for('listar_usuarios'))
 
         usuario = conn.execute(text("SELECT * FROM usuarios WHERE id_usuario=:id"), {"id": id}).fetchone()
-    return render_template('form.html', tabela='usuarios', dado=usuario)
+    return render_template('usuarios/editar_usuario.html', tabela='usuarios', dado=usuario)
 
 # Excluir Usuários
 @app.route('/usuarios/excluir/<int:id>')
@@ -330,5 +330,6 @@ def excluir_usuario(id):
         conn.commit()
     flash('Usuário excluído com sucesso!', 'success')
     return redirect(url_for('listar_usuarios'))
+
 
 
