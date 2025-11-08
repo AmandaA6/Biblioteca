@@ -50,4 +50,21 @@ with engine.connect() as conn:
         )
     """))
 
+    conn.execute(text("""
+        CREATE TABLE IF NOT EXISTS Livros (
+            ID_livro INT AUTO_INCREMENT PRIMARY KEY,
+            Titulo VARCHAR(255) NOT NULL,
+            Autor_id INT,
+            ISBN VARCHAR(20),
+            Ano_publicacao INT,
+            Genero_id INT,
+            Editora_id INT,
+            Quantidade_disponivel INT DEFAULT 0,
+            Resumo TEXT,
+            FOREIGN KEY (Autor_id) REFERENCES Autores(ID_autor),
+            FOREIGN KEY (Genero_id) REFERENCES generos(id_genero),
+            FOREIGN KEY (Editora_id) REFERENCES Editoras(ID_editora)
+        )
+    """))
+
     print("Tabelas criadas ou já existiam.")
