@@ -12,6 +12,7 @@ engine = create_engine(f"mysql+pymysql://{user}:{password}@{host}:{port}/{databa
 
 # --- Criação das tabelas ---
 with engine.connect() as conn:
+
     conn.execute(text("""
         CREATE TABLE IF NOT EXISTS Autores (
             ID_autor INT AUTO_INCREMENT PRIMARY KEY,
@@ -23,10 +24,29 @@ with engine.connect() as conn:
     """))
 
     conn.execute(text("""
+        CREATE TABLE IF NOT EXISTS generos (
+            id_genero INT AUTO_INCREMENT PRIMARY KEY,
+            nome_genero VARCHAR(255) NOT NULL
+        )
+    """))
+
+    conn.execute(text("""
         CREATE TABLE IF NOT EXISTS Editoras (
             ID_editora INT AUTO_INCREMENT PRIMARY KEY,
             Nome_editora VARCHAR(255) NOT NULL,
             Endereco_editora TEXT
+        )
+    """))
+
+    conn.execute(text("""
+        CREATE TABLE IF NOT EXISTS usuarios (
+            id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+            nome_usuario VARCHAR(255) NOT NULL,
+            email VARCHAR(255) NOT NULL,
+            numero_telefone VARCHAR(20),
+            data_inscricao DATE,
+            multa_atual DECIMAL(10,2) DEFAULT 0.00,
+            senha VARCHAR(255) NOT NULL
         )
     """))
 
