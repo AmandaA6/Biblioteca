@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Confirmar Exclusão</h2>
+    
+    <div class="confirmation-box">
+        <p>Tem certeza que deseja excluir o livro <strong>"{{ livro.Titulo }}"</strong>?</p>
+        <p>Esta ação não pode ser desfeita.</p>
+        
+        <div class="actions">
+            <form method="POST" action="{{ url_for('excluir_livro', id=livro.ID_livro) }}">
+                <button type="submit" class="btn btn-danger">Sim, Excluir</button>
+                <a href="{{ url_for('listar_livros') }}" class="btn">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.confirmation-box {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    border-left: 4px solid #e74c3c;
+    margin: 2rem 0;
+}
+</style>
+{% endblock %}

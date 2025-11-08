@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Lista de Livros</h2>
+    
+    <a href="{{ url_for('criar_livro') }}" class="btn">Novo Livro</a>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Título</th>
+                <th>Autor</th>
+                <th>ISBN</th>
+                <th>Ano</th>
+                <th>Gênero</th>
+                <th>Editora</th>
+                <th>Quantidade</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for livro in livros %}
+            <tr>
+                <td>{{ livro.ID_livro }}</td>
+                <td>{{ livro.Titulo }}</td>
+                <td>{{ livro.Nome_autor or '-' }}</td>
+                <td>{{ livro.ISBN }}</td>
+                <td>{{ livro.Ano_publicacao }}</td>
+                <td>{{ livro.nome_genero or '-' }}</td>
+                <td>{{ livro.Nome_editora or '-' }}</td>
+                <td>{{ livro.Quantidade_disponivel }}</td>
+                <td>
+                    <a href="{{ url_for('editar_livro', id=livro.ID_livro) }}" class="btn">Editar</a>
+                    <a href="{{ url_for('excluir_livro', id=livro.ID_livro) }}" class="btn btn-danger" 
+                       onclick="return confirm('Tem certeza que deseja excluir este livro?')">Excluir</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

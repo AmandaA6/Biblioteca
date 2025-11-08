@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Editar Livro</h2>
+    
+    <form method="POST">
+        <div class="form-group">
+            <label for="titulo">Título:</label>
+            <input type="text" id="titulo" name="titulo" value="{{ livro.Titulo }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="autor_id">Autor:</label>
+            <select id="autor_id" name="autor_id" required>
+                <option value="">Selecione um autor</option>
+                {% for autor in autores %}
+                    <option value="{{ autor.ID_autor }}" {% if livro.Autor_id == autor.ID_autor %}selected{% endif %}>
+                        {{ autor.Nome_autor }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="isbn">ISBN:</label>
+            <input type="text" id="isbn" name="isbn" value="{{ livro.ISBN }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="ano_publicacao">Ano de Publicação:</label>
+            <input type="number" id="ano_publicacao" name="ano_publicacao" value="{{ livro.Ano_publicacao }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="genero_id">Gênero:</label>
+            <select id="genero_id" name="genero_id" required>
+                <option value="">Selecione um gênero</option>
+                {% for genero in generos %}
+                    <option value="{{ genero.id_genero }}" {% if livro.Genero_id == genero.id_genero %}selected{% endif %}>
+                        {{ genero.nome_genero }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="editora_id">Editora:</label>
+            <select id="editora_id" name="editora_id" required>
+                <option value="">Selecione uma editora</option>
+                {% for editora in editoras %}
+                    <option value="{{ editora.ID_editora }}" {% if livro.Editora_id == editora.ID_editora %}selected{% endif %}>
+                        {{ editora.Nome_editora }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="quantidade">Quantidade Disponível:</label>
+            <input type="number" id="quantidade" name="quantidade" value="{{ livro.Quantidade_disponivel }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="resumo">Resumo:</label>
+            <textarea id="resumo" name="resumo" rows="4">{{ livro.Resumo or '' }}</textarea>
+        </div>
+        
+        <button type="submit" class="btn">Atualizar Livro</button>
+        <a href="{{ url_for('listar_livros') }}" class="btn">Cancelar</a>
+    </form>
+</div>
+{% endblock %}
