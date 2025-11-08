@@ -331,5 +331,129 @@ def excluir_usuario(id):
     flash('Usuário excluído com sucesso!', 'success')
     return redirect(url_for('listar_usuarios'))
 
+# Listar Livros
+@app.route("/livros")
+def listar_livros():
+    with engine.connect() as conn:
+        livros = conn.execute(text("""
+            SELECT l.*, a.Nome_autor, g.nome_genero, e.Nome_editora 
+            FROM Livros l
+            LEFT JOIN Autores a ON l.Autor_id = a.ID_autor
+            LEFT JOIN generos g ON l.Genero_id = g.id_genero
+            LEFT JOIN Editoras e ON l.Editora_id = e.ID_editora
+        """)).fetchall()
+    return render_template("livros/listar_livro.html", livros=livros)
+
+# Cadastrar Livros
+@app.route("/livros/criar_livro", methods=["GET", "POST"])
+def criar_livro():
+    with engine.connect() as conn:
+        autores = conn.execute(text("SELECT * FROM Autores")).fetchall()
+        generos = conn.execute(text("SELECT * FROM generos")).fetchall()
+        editoras = conn.execute(text("SELECT * FROM Editoras")).fetchall()
+        
+    if request.method == "POST":
+        titulo = request.form.get("titulo")
+        autor_id = request.form.get("autor_id")
+        isbn = request.form.get("isbn")
+        ano_publicacao = request.form.get("ano_publicacao")
+        genero_id = request.form.get("genero_id")
+        editora_id = request.form.get("editora_id")
+        quantidade = request.form.get("quantidade")
+        resumo = request.form.get("resumo")
+
+        with engine.begin() as conn:
+            conn.execute(
+                text("""
+                    INSERT INTO Livros 
+                    (Titulo, Autor_id, ISBN, Ano_publicacao, Genero_id, Editora_id, Quantidade_disponivel, Resumo) 
+                    VALUES (:titulo, :autor_id, :isbn, :ano_publicacao, :genero_id, :editora_id, :quantidade, :resumo)
+                """),
+                {
+                    "titulo": titulo,
+                    "autor_id": autor_id,
+                    "isbn": isbn,
+                    "ano_publicacao": ano_publicacao,
+                    "genero_id": genero_id,
+                    "editora_id": editora_id,
+                    "quantidade": quantidade,
+                    "resumo": resumo
+                }
+            )
+        flash("Livro criado com sucesso!", "success")
+        return redirect(url_for("listar_livros"))
+
+    return render_template("livros/criar_livro.html", autores=autores, generos=generos, editoras=editoras)
+
+# Editar Livros
+@app.route("/livros/editar_livro/<int:id>", methods=["GET", "POST"])
+def editar_livro(id):
+    with engine.connect() as conn:
+        livro = conn.execute(
+            text("SELECT * FROM Livros WHERE ID_livro = :id"), {"id": id}
+        ).fetchone()
+        
+        autores = conn.execute(text("SELECT * FROM Autores")).fetchall()
+        generos = conn.execute(text("SELECT * FROM generos")).fetchall()
+        editoras = conn.execute(text("SELECT * FROM Editoras")).fetchall()
+    
+    if not livro:
+        flash("Livro não encontrado!", "error")
+        return redirect(url_for("listar_livros"))
+
+    if request.method == "POST":
+        titulo = request.form.get("titulo")
+        autor_id = request.form.get("autor_id")
+        isbn = request.form.get("isbn")
+        ano_publicacao = request.form.get("ano_publicacao")
+        genero_id = request.form.get("genero_id")
+        editora_id = request.form.get("editora_id")
+        quantidade = request.form.get("quantidade")
+        resumo = request.form.get("resumo")
+        
+        with engine.begin() as conn:
+            conn.execute(
+                text("""
+                    UPDATE Livros
+                    SET Titulo = :titulo,
+                        Autor_id = :autor_id,
+                        ISBN = :isbn,
+                        Ano_publicacao = :ano_publicacao,
+                        Genero_id = :genero_id,
+                        Editora_id = :editora_id,
+                        Quantidade_disponivel = :quantidade,
+                        Resumo = :resumo
+                    WHERE ID_livro = :id
+                """),
+                {
+                    "titulo": titulo,
+                    "autor_id": autor_id,
+                    "isbn": isbn,
+                    "ano_publicacao": ano_publicacao,
+                    "genero_id": genero_id,
+                    "editora_id": editora_id,
+                    "quantidade": quantidade,
+                    "resumo": resumo,
+                    "id": id
+                }
+            )
+        flash("Livro atualizado com sucesso!", "success")
+        return redirect(url_for("listar_livros"))
+
+    return render_template("livros/editar_livro.html", 
+                         livro=livro, autores=autores, generos=generos, editoras=editoras)
+
+# Excluir Livros
+@app.route("/livros/excluir_livro/<int:id>")
+def excluir_livro(id):
+    with engine.begin() as conn:
+        conn.execute(
+            text("DELETE FROM Livros WHERE ID_livro = :id"),
+            {"id": id}
+        )
+    flash("Livro excluído com sucesso!", "success")
+    return redirect(url_for("listar_livros"))
+
+
 
 
