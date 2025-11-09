@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Editoras</title>
+</head>
+<body>
+    <h1>Editoras</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul>
+        {% for category, message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <a href="{{ url_for('cadastrar_editora') }}">Cadastrar Nova Editora</a>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Endereço</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for editora in editoras %}
+            <tr>
+                <td>{{ editora.ID_editora }}</td>
+                <td>{{ editora.Nome_editora }}</td>
+                <td>{{ editora.Endereco_editora }}</td>
+                <td>
+                    <a href="{{ url_for('editar_editora', id=editora.ID_editora) }}">Editar</a> |
+                    <a href="{{ url_for('excluir_editora', id=editora.ID_editora) }}" onclick="return confirm('Deseja realmente excluir?');">Excluir</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
