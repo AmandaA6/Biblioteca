@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import text
 from database import engine
@@ -453,6 +453,7 @@ def excluir_livro(id):
         )
     flash("Livro excluído com sucesso!", "success")
     return redirect(url_for("listar_livros"))
+
 
 
 
