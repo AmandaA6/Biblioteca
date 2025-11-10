@@ -1,11 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastrar Gênero</title>
-</head>
-<body>
+{% extends "index.html" %}
+
+{% block content %}
     <h2>{{ 'Editar' if dado else 'Novo' }} {{ tabela|capitalize }}</h2>
 
     <form method="POST">
@@ -24,5 +19,4 @@
         <button type="submit">Salvar</button>
     </form>
 
-</body>
-</html>
+{% endblock %}
