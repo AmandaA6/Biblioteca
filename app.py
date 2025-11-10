@@ -123,7 +123,7 @@ def excluir_genero(id):
         conn.execute(text("DELETE FROM generos WHERE id_genero=:id"), {"id": id})
         conn.commit()
     flash('Gênero excluído com sucesso!', 'success')
-    return redirect(url_for('listar_genero'))
+    return redirect(url_for('listar_generos'))
 
 #---AUTORES ---
 
