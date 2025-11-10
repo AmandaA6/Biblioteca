@@ -1,10 +1,6 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Cadastrar Editora</title>
-</head>
-<body>
+{% extends "index.html" %}
+
+{% block content %}
     <h1>Cadastrar Editora</h1>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -29,5 +25,5 @@
 
     <br>
     <a href="{{ url_for('listar_editora') }}">Voltar para a lista</a>
-</body>
-</html>
+
+{% endblock %}
