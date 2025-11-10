@@ -2,9 +2,28 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import text
 from database import engine
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 app.secret_key = "chave_secreta"
+
+def atualizar_status_emprestimos():
+    with engine.connect() as conn:
+        conn.execute(text("""
+            UPDATE Emprestimos 
+            SET Status_emprestimo = 'atrasado' 
+            WHERE Status_emprestimo = 'pendente' 
+            AND Data_devolucao_prevista < CURDATE()
+        """))
+        conn.commit()
+
+@app.before_request
+def before_request():
+    atualizar_status_emprestimos()
+
+@app.context_processor
+def inject_today_date():
+    return {'today': datetime.now().date()}
 
 @app.route('/')
 def index():
@@ -104,7 +123,7 @@ def excluir_genero(id):
         conn.execute(text("DELETE FROM generos WHERE id_genero=:id"), {"id": id})
         conn.commit()
     flash('Gênero excluído com sucesso!', 'success')
-    return redirect(url_for('listar_generos'))
+    return redirect(url_for('listar_genero'))
 
 #---AUTORES ---
 
@@ -454,7 +473,168 @@ def excluir_livro(id):
     flash("Livro excluído com sucesso!", "success")
     return redirect(url_for("listar_livros"))
 
+#---EMPRÉSTIMOS ---
 
+# Listar Empréstimos
+@app.route("/emprestimos")
+def listar_emprestimos():
+    with engine.connect() as conn:
+        emprestimos = conn.execute(text("""
+            SELECT e.*, u.nome_usuario, l.Titulo 
+            FROM Emprestimos e
+            LEFT JOIN usuarios u ON e.Usuario_id = u.id_usuario
+            LEFT JOIN Livros l ON e.Livro_id = l.ID_livro
+            ORDER BY e.Data_emprestimo DESC
+        """)).fetchall()
+    return render_template("emprestimos/listar_emprestimo.html", emprestimos=emprestimos)
 
+# Criar Empréstimo
+@app.route("/emprestimos/novo", methods=["GET", "POST"])
+def novo_emprestimo():
+    with engine.connect() as conn:
+        usuarios = conn.execute(text("SELECT * FROM usuarios")).fetchall()
+        livros = conn.execute(text("SELECT * FROM Livros WHERE Quantidade_disponivel > 0")).fetchall()
+        
+    if request.method == "POST":
+        usuario_id = request.form.get("usuario_id")
+        livro_id = request.form.get("livro_id")
+        data_emprestimo = request.form.get("data_emprestimo")
+        
+        data_emprestimo_obj = datetime.strptime(data_emprestimo, '%Y-%m-%d')
+        data_devolucao_prevista = data_emprestimo_obj + timedelta(days=20)
+        data_devolucao_prevista_str = data_devolucao_prevista.strftime('%Y-%m-%d')
+        
+        with engine.begin() as conn:
+            usuario = conn.execute(
+                text("SELECT multa_atual FROM usuarios WHERE id_usuario = :id"),
+                {"id": usuario_id}
+            ).fetchone()
+            
+            if usuario and usuario.multa_atual > 0:
+                flash("Usuário possui multa pendente e não pode fazer empréstimos!", "error")
+                return redirect(url_for("novo_emprestimo"))
+            
+            conn.execute(
+                text("""
+                    INSERT INTO Emprestimos 
+                    (Usuario_id, Livro_id, Data_emprestimo, Data_devolucao_prevista, Status_emprestimo) 
+                    VALUES (:usuario_id, :livro_id, :data_emprestimo, :data_devolucao_prevista, 'pendente')
+                """),
+                {
+                    "usuario_id": usuario_id,
+                    "livro_id": livro_id,
+                    "data_emprestimo": data_emprestimo,
+                    "data_devolucao_prevista": data_devolucao_prevista_str
+                }
+            )
+            
+            conn.execute(
+                text("UPDATE Livros SET Quantidade_disponivel = Quantidade_disponivel - 1 WHERE ID_livro = :id"),
+                {"id": livro_id}
+            )
+            
+        flash(f"Empréstimo realizado com sucesso! Data de devolução: {data_devolucao_prevista_str}", "success")
+        return redirect(url_for("listar_emprestimos"))
 
+    return render_template("emprestimos/novo_emprestimo.html", usuarios=usuarios, livros=livros)
 
+# Devolver Empréstimo
+@app.route("/emprestimos/devolver/<int:id>", methods=["GET", "POST"])
+def devolver_emprestimo(id):
+    with engine.connect() as conn:
+        emprestimo = conn.execute(
+            text("""
+                SELECT e.*, u.nome_usuario, l.Titulo, l.ID_livro 
+                FROM Emprestimos e
+                LEFT JOIN usuarios u ON e.Usuario_id = u.id_usuario
+                LEFT JOIN Livros l ON e.Livro_id = l.ID_livro
+                WHERE e.ID_emprestimo = :id
+            """),
+            {"id": id}
+        ).fetchone()
+
+    if not emprestimo:
+        flash("Empréstimo não encontrado!", "error")
+        return redirect(url_for("listar_emprestimos"))
+
+    if request.method == "POST":
+        data_devolucao_real = request.form.get("data_devolucao_real")
+        
+        with engine.begin() as conn:
+            from datetime import datetime
+            data_devolucao_real_obj = datetime.strptime(data_devolucao_real, '%Y-%m-%d')
+            data_prevista_obj = datetime.strptime(str(emprestimo.Data_devolucao_prevista), '%Y-%m-%d')
+            
+            multa_aplicada = 0.0
+            mensagem = "Devolução realizada com sucesso!"
+            
+            if data_devolucao_real_obj > data_prevista_obj:
+                dias_atraso = (data_devolucao_real_obj - data_prevista_obj).days
+                multa_aplicada = dias_atraso * 2.00
+                
+                conn.execute(
+                    text("UPDATE usuarios SET multa_atual = multa_atual + :multa WHERE id_usuario = :id"),
+                    {"multa": multa_aplicada, "id": emprestimo.Usuario_id}
+                )
+                mensagem = f"Devolução realizada! Multa de R$ {multa_aplicada:.2f} aplicada ({dias_atraso} dias de atraso)"
+            
+            conn.execute(
+                text("""
+                    UPDATE Emprestimos 
+                    SET Data_devolucao_real = :data_devolucao_real, 
+                        Status_emprestimo = 'devolvido'
+                    WHERE ID_emprestimo = :id
+                """),
+                {
+                    "data_devolucao_real": data_devolucao_real,
+                    "id": id
+                }
+            )
+
+            conn.execute(
+                text("UPDATE Livros SET Quantidade_disponivel = Quantidade_disponivel + 1 WHERE ID_livro = :id"),
+                {"id": emprestimo.Livro_id}
+            )
+            
+        flash(mensagem, "warning" if multa_aplicada > 0 else "success")
+        return redirect(url_for("listar_emprestimos"))
+
+    return render_template("emprestimos/devolver_emprestimo.html", emprestimo=emprestimo)
+
+# Excluir Empréstimo
+@app.route("/emprestimos/excluir/<int:id>")
+def excluir_emprestimo(id):
+    with engine.begin() as conn:
+        emprestimo = conn.execute(
+            text("SELECT * FROM Emprestimos WHERE ID_emprestimo = :id"),
+            {"id": id}
+        ).fetchone()
+        
+        if emprestimo and emprestimo.Status_emprestimo == 'pendente':
+            conn.execute(
+                text("UPDATE Livros SET Quantidade_disponivel = Quantidade_disponivel + 1 WHERE ID_livro = :id"),
+                {"id": emprestimo.Livro_id}
+            )
+        
+        conn.execute(
+            text("DELETE FROM Emprestimos WHERE ID_emprestimo = :id"),
+            {"id": id}
+        )
+    
+    flash("Empréstimo excluído com sucesso!", "success")
+    return redirect(url_for("listar_emprestimos"))
+
+@app.route("/emprestimos/atrasados")
+def listar_emprestimos_atrasados():
+    with engine.connect() as conn:
+        emprestimos_atrasados = conn.execute(text("""
+            SELECT e.*, u.nome_usuario, l.Titulo,
+                   DATEDIFF(CURDATE(), e.Data_devolucao_prevista) as dias_atraso
+            FROM Emprestimos e
+            LEFT JOIN usuarios u ON e.Usuario_id = u.id_usuario
+            LEFT JOIN Livros l ON e.Livro_id = l.ID_livro
+            WHERE e.Status_emprestimo = 'pendente'
+            AND e.Data_devolucao_prevista < CURDATE()
+            ORDER BY e.Data_devolucao_prevista ASC
+        """)).fetchall()
+    return render_template("emprestimos/listar_atrasados.html", emprestimos=emprestimos_atrasados)
