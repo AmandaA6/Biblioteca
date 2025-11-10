@@ -1,11 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Usuário</title>
-</head>
-<body>
+{% extends "index.html" %}
+
+{% block content %}
     <h2>Cadastro de Usuário</h2>
 
     <form method="POST">
@@ -29,5 +24,4 @@
 
     <p>Já tem conta? <a href="{{ url_for('login') }}">Faça login</a></p>
 
-</body>
-</html>
+{% endblock %}
