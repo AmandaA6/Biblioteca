@@ -492,7 +492,10 @@ def listar_emprestimos():
 @app.route("/emprestimos/novo", methods=["GET", "POST"])
 def novo_emprestimo():
     with engine.connect() as conn:
-        usuarios = conn.execute(text("SELECT * FROM usuarios")).fetchall()
+        usuarios = conn.execute(
+            text("SELECT id_usuario, nome_usuario, multa_atual FROM usuarios")
+        ).fetchall()
+        
         livros = conn.execute(text("SELECT * FROM Livros WHERE Quantidade_disponivel > 0")).fetchall()
         
     if request.method == "POST":
@@ -500,19 +503,20 @@ def novo_emprestimo():
         livro_id = request.form.get("livro_id")
         data_emprestimo = request.form.get("data_emprestimo")
         
+        from datetime import datetime, timedelta
         data_emprestimo_obj = datetime.strptime(data_emprestimo, '%Y-%m-%d')
         data_devolucao_prevista = data_emprestimo_obj + timedelta(days=20)
         data_devolucao_prevista_str = data_devolucao_prevista.strftime('%Y-%m-%d')
         
         with engine.begin() as conn:
-            usuario = conn.execute(
-                text("SELECT multa_atual FROM usuarios WHERE id_usuario = :id"),
+            usuario_info = conn.execute(
+                text("SELECT nome_usuario, multa_atual FROM usuarios WHERE id_usuario = :id"),
                 {"id": usuario_id}
             ).fetchone()
             
-            if usuario and usuario.multa_atual > 0:
-                flash("Usuário possui multa pendente e não pode fazer empréstimos!", "error")
-                return redirect(url_for("novo_emprestimo"))
+            mensagem_aviso = ""
+            if usuario_info and usuario_info.multa_atual > 0:
+                mensagem_aviso = f" Usuário possui multa pendente de R$ {usuario_info.multa_atual:.2f}."
             
             conn.execute(
                 text("""
@@ -533,7 +537,8 @@ def novo_emprestimo():
                 {"id": livro_id}
             )
             
-        flash(f"Empréstimo realizado com sucesso! Data de devolução: {data_devolucao_prevista_str}", "success")
+        flash(f"Empréstimo realizado com sucesso! Data de devolução: {data_devolucao_prevista_str}.{mensagem_aviso}", 
+              "warning" if mensagem_aviso else "success")
         return redirect(url_for("listar_emprestimos"))
 
     return render_template("emprestimos/novo_emprestimo.html", usuarios=usuarios, livros=livros)
@@ -624,8 +629,11 @@ def excluir_emprestimo(id):
     flash("Empréstimo excluído com sucesso!", "success")
     return redirect(url_for("listar_emprestimos"))
 
+# Listar Empréstimos Atrasados
 @app.route("/emprestimos/atrasados")
 def listar_emprestimos_atrasados():
+    atualizar_status_emprestimos()
+    
     with engine.connect() as conn:
         emprestimos_atrasados = conn.execute(text("""
             SELECT e.*, u.nome_usuario, l.Titulo,
@@ -633,8 +641,9 @@ def listar_emprestimos_atrasados():
             FROM Emprestimos e
             LEFT JOIN usuarios u ON e.Usuario_id = u.id_usuario
             LEFT JOIN Livros l ON e.Livro_id = l.ID_livro
-            WHERE e.Status_emprestimo = 'pendente'
-            AND e.Data_devolucao_prevista < CURDATE()
+            WHERE e.Status_emprestimo = 'atrasado'
             ORDER BY e.Data_devolucao_prevista ASC
         """)).fetchall()
+    
+    print(f"Empréstimos atrasados encontrados: {len(emprestimos_atrasados)}")
     return render_template("emprestimos/listar_atrasados.html", emprestimos=emprestimos_atrasados)
