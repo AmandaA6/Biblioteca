@@ -1,0 +1,51 @@
+{% extends "index.html" %}
+
+{% block content %}
+<h2>Lista de Empréstimos</h2>
+
+<a href="{{ url_for('novo_emprestimo') }}" class="btn">Novo Empréstimo</a>
+<a href="{{ url_for('listar_emprestimos_atrasados') }}" class="btn">Ver Atrasados</a>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Usuário</th>
+            <th>Livro</th>
+            <th>Data Empréstimo</th>
+            <th>Devolução Prevista</th>
+            <th>Devolução Real</th>
+            <th>Status</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for emprestimo in emprestimos %}
+        <tr>
+            <td>{{ emprestimo.ID_emprestimo }}</td>
+            <td>{{ emprestimo.nome_usuario }}</td>
+            <td>{{ emprestimo.Titulo }}</td>
+            <td>{{ emprestimo.Data_emprestimo }}</td>
+            <td>{{ emprestimo.Data_devolucao_prevista }}</td>
+            <td>{{ emprestimo.Data_devolucao_real or '-' }}</td>
+            <td>
+                {% if emprestimo.Status_emprestimo == 'pendente' %}
+                    <span style="color: blue;">PENDENTE</span>
+                {% elif emprestimo.Status_emprestimo == 'devolvido' %}
+                    <span style="color: green;">DEVOLVIDO</span>
+                {% elif emprestimo.Status_emprestimo == 'atrasado' %}
+                    <span style="color: red;">ATRASADO</span>
+                {% endif %}
+            </td>
+            <td class="actions">
+                {% if emprestimo.Status_emprestimo != 'devolvido' %}
+                    <a href="{{ url_for('devolver_emprestimo', id=emprestimo.ID_emprestimo) }}" class="btn btn-success">Devolver</a>
+                {% endif %}
+                <a href="{{ url_for('excluir_emprestimo', id=emprestimo.ID_emprestimo) }}" class="btn btn-danger" 
+                   onclick="return confirm('Tem certeza que deseja excluir este empréstimo?')">Excluir</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
