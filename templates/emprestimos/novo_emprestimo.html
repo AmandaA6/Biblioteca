@@ -9,7 +9,12 @@
         <select id="usuario_id" name="usuario_id" required>
             <option value="">Selecione um usuário</option>
             {% for usuario in usuarios %}
-                <option value="{{ usuario.id_usuario }}">{{ usuario.nome_usuario }}</option>
+                <option value="{{ usuario.id_usuario }}">
+                    {{ usuario.nome_usuario }} 
+                    {% if usuario.multa_atual > 0 %}
+                        (Multa pendente: R$ {{ "%.2f"|format(usuario.multa_atual) }})
+                    {% endif %}
+                </option>
             {% endfor %}
         </select>
     </div>
