@@ -67,4 +67,19 @@ with engine.connect() as conn:
         )
     """))
 
+    conn.execute(text("""
+        CREATE TABLE IF NOT EXISTS Emprestimos (
+            ID_emprestimo INT AUTO_INCREMENT PRIMARY KEY,
+            Usuario_id INT,
+            Livro_id INT,
+            Data_emprestimo DATE,
+            Data_devolucao_prevista DATE,
+            Data_devolucao_real DATE,
+            Status_emprestimo ENUM('pendente', 'devolvido', 'atrasado'),
+            FOREIGN KEY (Usuario_id) REFERENCES Usuarios(id_usuario),
+            FOREIGN KEY (Livro_id) REFERENCES Livros(ID_livro)
+        )
+    """))
+
     print("Tabelas criadas ou já existiam.")
+
