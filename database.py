@@ -2,9 +2,9 @@ from sqlalchemy import create_engine, text
 
 # --- Configuração do banco já existente ---
 user = "root"
-password = "felipe"
+password = ""
 host = "localhost"
-port = 3307
+port = 3306
 database = "db_biblioteca"
 
 # Montando a URL corretamente com porta
@@ -82,4 +82,5 @@ with engine.connect() as conn:
     """))
 
     print("Tabelas criadas ou já existiam.")
+
 
