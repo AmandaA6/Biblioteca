@@ -1,0 +1,46 @@
+{% extends "index.html" %}
+
+{% block content %}
+<h2>Empréstimos Atrasados</h2>
+
+<a href="{{ url_for('listar_emprestimos') }}" class="btn">Voltar para Todos os Empréstimos</a>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Usuário</th>
+            <th>Livro</th>
+            <th>Data Empréstimo</th>
+            <th>Devolução Prevista</th>
+            <th>Dias em Atraso</th>
+            <th>Multa Calculada</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for emprestimo in emprestimos %}
+        {% set dias_atraso = (today - emprestimo.Data_devolucao_prevista).days %}
+        {% set multa = dias_atraso * 2.00 %}
+        <tr>
+            <td>{{ emprestimo.ID_emprestimo }}</td>
+            <td>{{ emprestimo.nome_usuario }}</td>
+            <td>{{ emprestimo.Titulo }}</td>
+            <td>{{ emprestimo.Data_emprestimo }}</td>
+            <td>{{ emprestimo.Data_devolucao_prevista }}</td>
+            <td style="color: red; font-weight: bold;">{{ dias_atraso }} dias</td>
+            <td style="color: red; font-weight: bold;">R$ {{ "%.2f"|format(multa) }}</td>
+            <td class="actions">
+                <a href="{{ url_for('devolver_emprestimo', id=emprestimo.ID_emprestimo) }}" class="btn btn-success">Devolver</a>
+                <a href="{{ url_for('excluir_emprestimo', id=emprestimo.ID_emprestimo) }}" class="btn btn-danger" 
+                   onclick="return confirm('Tem certeza que deseja excluir este empréstimo?')">Excluir</a>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="8" style="text-align: center;">Nenhum empréstimo atrasado encontrado</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
