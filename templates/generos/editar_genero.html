@@ -1,10 +1,6 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Editar Gênero</title>
-</head>
-<body>
+{% extends "index.html" %}
+
+{% block content %}
 <div class="container mt-5">
     <h2>Editar Gênero</h2>
     <form action="{{ url_for('editar_genero', id=dado.id_genero) }}" method="POST">
@@ -16,5 +12,5 @@
         <a href="{{ url_for('listar_generos') }}" class="">Cancelar</a>
     </form>
 </div>
-</body>
-</html>
+
+{% endblock %}
