@@ -120,23 +120,28 @@ def editar_genero(id):
 @app.route('/generos/excluir/<int:id>')
 def excluir_genero(id):
     with engine.connect() as conn:
-        conn.execute(text("DELETE FROM generos WHERE id_genero=:id"), {"id": id})
-        conn.commit()
-    flash('Gênero excluído com sucesso!', 'success')
+        try:
+            conn.execute(text("DELETE FROM generos WHERE id_genero=:id"), {"id": id})
+            conn.commit()
+            flash('Gênero excluído com sucesso!', 'success')
+        except:
+            flash('Gênero não pode ser excluído!', 'danger')
+        finally:
+            conn.close()
+
+    
     return redirect(url_for('listar_generos'))
 
 #---AUTORES ---
 
-#Listar
-
+# Listar
 @app.route("/autores")
 def listar_autor():
     with engine.connect() as conn:
         autores = conn.execute(text("SELECT * FROM Autores")).fetchall()
     return render_template("autores/listar_autor.html", autores=autores)
 
-#Cadastrar 
-
+# Cadastrar 
 @app.route("/autores/cadastrar_autor", methods=["GET", "POST"])
 def cadastrar_autor():
     if request.method == "POST":
@@ -175,8 +180,7 @@ def cadastrar_autor():
 
     return render_template("autores/cadastrar_autor.html")
        
-#Editar
-
+# Editar
 @app.route("/autores/editar_autor/<int:id>", methods=["GET", "POST"])
 def editar_autor(id):
     with engine.connect() as conn:
@@ -217,8 +221,7 @@ def editar_autor(id):
 
     return render_template("autores/editar_autor.html", autor=autor)
 
-#Excluir
-
+# Excluir
 @app.route("/autores/excluir_autor/<int:id>")
 def excluir_autor(id):
     with engine.begin() as conn:
