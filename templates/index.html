@@ -11,7 +11,7 @@
         <div class="nav-container">
             <div class="nav-brand">Biblioteca Online</div>
             <div class="nav-links">
-                <a href="{{ url_for('cadastro') }}">Início</a>
+                <a href="{{ url_for('index') }}">Início</a>
                 {% if session.usuario_id %}
                     <a href="{{ url_for('listar_livros') }}">Livros</a>
                     <a href="{{ url_for('listar_autor') }}">Autores</a>
