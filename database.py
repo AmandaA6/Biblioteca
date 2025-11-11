@@ -1,18 +1,14 @@
 from sqlalchemy import create_engine, text
 
-# --- Configuração do banco já existente ---
 user = "root"
 password = ""
 host = "localhost"
 port = 3306
 database = "db_biblioteca"
 
-# Montando a URL corretamente com porta
 engine = create_engine(f"mysql+pymysql://{user}:{password}@{host}:{port}/{database}")
 
-# --- Criação das tabelas ---
 with engine.connect() as conn:
-
     conn.execute(text("""
         CREATE TABLE IF NOT EXISTS Autores (
             ID_autor INT AUTO_INCREMENT PRIMARY KEY,
@@ -82,5 +78,3 @@ with engine.connect() as conn:
     """))
 
     print("Tabelas criadas ou já existiam.")
-
-
