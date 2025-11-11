@@ -1,6 +1,3 @@
-/* CSS Simples - Biblioteca Online */
-/* Cores: #261c1a #ac8f83 #ada0a2 #d5ccc7 */
-
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -9,7 +6,6 @@ body {
     color: #261c1a;
 }
 
-/* Menu de navegação */
 .navbar {
     background-color: #261c1a;
     padding: 12px 0;
@@ -51,7 +47,6 @@ body {
     font-style: italic;
 }
 
-/* Container principal */
 .container {
     width: 90%;
     margin: 20px auto;
@@ -61,7 +56,6 @@ body {
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-/* Mensagens */
 .flash {
     padding: 12px;
     margin-bottom: 15px;
@@ -87,7 +81,6 @@ body {
     border-left-color: #ff9800;
 }
 
-/* Botões */
 .btn {
     display: inline-block;
     padding: 8px 16px;
@@ -123,7 +116,6 @@ body {
     background-color: #9a7c70;
 }
 
-/* Tabelas */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -152,7 +144,6 @@ tr:hover {
     background-color: #f5f5f5;
 }
 
-/* Formulários */
 form {
     margin: 15px 0;
 }
@@ -180,7 +171,6 @@ input:focus, select:focus, textarea:focus {
     box-shadow: 0 0 5px rgba(172, 143, 131, 0.3);
 }
 
-/* Cards */
 .card {
     background-color: white;
     border: 1px solid #d5ccc7;
@@ -196,7 +186,6 @@ input:focus, select:focus, textarea:focus {
     margin-bottom: 15px;
 }
 
-/* Status */
 .status-pendente {
     color: #ff9800;
     font-weight: bold;
@@ -212,7 +201,6 @@ input:focus, select:focus, textarea:focus {
     font-weight: bold;
 }
 
-/* Links */
 a {
     color: #ac8f83;
     text-decoration: none;
@@ -223,7 +211,6 @@ a:hover {
     text-decoration: underline;
 }
 
-/* Textos */
 h1, h2, h3, h4 {
     color: #261c1a;
     margin-bottom: 15px;
@@ -239,7 +226,6 @@ h2 {
     padding-bottom: 8px;
 }
 
-/* Alertas */
 .alert {
     padding: 15px;
     margin: 15px 0;
@@ -265,7 +251,6 @@ h2 {
     color: #856404;
 }
 
-/* Grid */
 .row {
     display: flex;
     flex-wrap: wrap;
@@ -292,7 +277,6 @@ h2 {
     padding: 0 10px;
 }
 
-/* Ações em tabelas */
 .actions {
     display: flex;
     gap: 5px;
@@ -304,42 +288,10 @@ h2 {
     margin: 2px;
 }
 
-/* Informações de empréstimo */
 .emprestimo-info {
     background-color: #f9f9f9;
     border: 1px solid #d5ccc7;
     border-radius: 5px;
     padding: 15px;
     margin: 15px 0;
-}
-
-/* Responsivo */
-@media (max-width: 768px) {
-    .nav-container {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .nav-links {
-        justify-content: center;
-        margin-top: 10px;
-        flex-wrap: wrap;
-    }
-    
-    .col, .col-6, .col-4, .col-3 {
-        flex: 0 0 100%;
-        margin-bottom: 15px;
-    }
-    
-    .actions {
-        flex-direction: column;
-    }
-    
-    table {
-        font-size: 14px;
-    }
-    
-    th, td {
-        padding: 8px;
-    }
 }
