@@ -225,11 +225,16 @@ def editar_autor(id):
 @app.route("/autores/excluir_autor/<int:id>")
 def excluir_autor(id):
     with engine.begin() as conn:
-        conn.execute(
+        try:
+            conn.execute(
             text("DELETE FROM Autores WHERE ID_autor = :id"),
             {"id": id}
         )
-    flash("Autor excluído com sucesso!", "success")
+            flash('Autor excluído com sucesso!', 'success')
+        except:
+            flash('Autor não pode ser excluído!', 'danger')
+        finally:
+            conn.close()
     return redirect(url_for("listar_autor"))
 
 
@@ -306,11 +311,16 @@ def editar_editora(id):
 @app.route("/editoras/excluir_editora/<int:id>")
 def excluir_editora(id):
     with engine.begin() as conn:
-        conn.execute(
+        try:
+            conn.execute(
             text("DELETE FROM Editoras WHERE ID_editora = :id"),
             {"id": id}
         )
-    flash("Editora excluída com sucesso!", "success")
+            flash('Editora excluído com sucesso!', 'success')
+        except:
+            flash('Editora não pode ser excluído!', 'danger')
+        finally:
+            conn.close()
     return redirect(url_for("listar_editora"))
 
 #---Usuários ---
@@ -350,7 +360,12 @@ def excluir_usuario(id):
     with engine.connect() as conn:
         conn.execute(text("DELETE FROM usuarios WHERE id_usuario=:id"), {"id": id})
         conn.commit()
-    flash('Usuário excluído com sucesso!', 'success')
+        try:
+            flash('Usuário excluído com sucesso!', 'success')
+        except:
+            flash('Usuário não pode ser excluído!', 'danger')
+        finally:
+            conn.close()
     return redirect(url_for('listar_usuarios'))
 
 # Listar Livros
