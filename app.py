@@ -318,7 +318,7 @@ def excluir_editora(id):
         )
             flash('Editora excluído com sucesso!', 'success')
         except:
-            flash('Editora não pode ser excluído!', 'danger')
+            flash('Editora não pode ser excluída!', 'danger')
         finally:
             conn.close()
     return redirect(url_for("listar_editora"))
@@ -665,3 +665,4 @@ def listar_emprestimos_atrasados():
     
     print(f"Empréstimos atrasados encontrados: {len(emprestimos_atrasados)}")
     return render_template("emprestimos/listar_atrasados.html", emprestimos=emprestimos_atrasados)
+
