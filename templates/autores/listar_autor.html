@@ -3,16 +3,6 @@
 {% block content %}
     <h1>Autores</h1>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul>
-        {% for category, message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
-
     <a href="{{ url_for('cadastrar_autor') }}">Cadastrar Novo Autor</a>
 
     <table border="1">
@@ -43,3 +33,4 @@
         </tbody>
     </table>
 {% endblock %}
+
