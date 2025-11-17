@@ -134,14 +134,14 @@ def excluir_genero(id):
 
 #---AUTORES ---
 
-# Listar
+# Listar Autores
 @app.route("/autores")
 def listar_autor():
     with engine.connect() as conn:
         autores = conn.execute(text("SELECT * FROM Autores")).fetchall()
     return render_template("autores/listar_autor.html", autores=autores)
 
-# Cadastrar 
+# Cadastrar Autores
 @app.route("/autores/cadastrar_autor", methods=["GET", "POST"])
 def cadastrar_autor():
     if request.method == "POST":
@@ -180,7 +180,7 @@ def cadastrar_autor():
 
     return render_template("autores/cadastrar_autor.html")
        
-# Editar
+# Editar Autores
 @app.route("/autores/editar_autor/<int:id>", methods=["GET", "POST"])
 def editar_autor(id):
     with engine.connect() as conn:
@@ -221,7 +221,7 @@ def editar_autor(id):
 
     return render_template("autores/editar_autor.html", autor=autor)
 
-# Excluir
+# Excluir Autores
 @app.route("/autores/excluir_autor/<int:id>")
 def excluir_autor(id):
     with engine.begin() as conn:
@@ -230,6 +230,7 @@ def excluir_autor(id):
             text("DELETE FROM Autores WHERE ID_autor = :id"),
             {"id": id}
         )
+            conn.commit()
             flash('Autor excluído com sucesso!', 'success')
         except:
             flash('Autor não pode ser excluído!', 'danger')
@@ -240,14 +241,14 @@ def excluir_autor(id):
 
 #---EDITORAS ---
 
-# Listar 
+# Listar Editoras
 @app.route("/editoras")
 def listar_editora():
     with engine.connect() as conn:
         editoras = conn.execute(text("SELECT * FROM Editoras")).fetchall()
     return render_template("editoras/listar_editora.html", editoras=editoras)
 
-# Cadastrar
+# Cadastrar Editoras
 @app.route("/editoras/cadastrar_editora", methods=["GET", "POST"])
 def cadastrar_editora():
     if request.method == "POST":
@@ -275,7 +276,7 @@ def cadastrar_editora():
 
     return render_template("editoras/cadastrar_editora.html")
 
-# Editar 
+# Editar Editoras
 @app.route("/editoras/editar_editora/<int:id>", methods=["GET", "POST"])
 def editar_editora(id):
     with engine.connect() as conn:
@@ -307,7 +308,7 @@ def editar_editora(id):
 
     return render_template("editoras/editar_editora.html", editora=editora)
 
-# Excluir 
+# Excluir Editoras
 @app.route("/editoras/excluir_editora/<int:id>")
 def excluir_editora(id):
     with engine.begin() as conn:
@@ -316,6 +317,7 @@ def excluir_editora(id):
             text("DELETE FROM Editoras WHERE ID_editora = :id"),
             {"id": id}
         )
+            conn.commit()
             flash('Editora excluído com sucesso!', 'success')
         except:
             flash('Editora não pode ser excluída!', 'danger')
@@ -665,4 +667,5 @@ def listar_emprestimos_atrasados():
     
     print(f"Empréstimos atrasados encontrados: {len(emprestimos_atrasados)}")
     return render_template("emprestimos/listar_atrasados.html", emprestimos=emprestimos_atrasados)
+
 
